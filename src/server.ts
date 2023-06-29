@@ -1,7 +1,14 @@
 import fastify from "fastify";
 import { knex } from "./database";
+import fs from "node:fs";
 
 const app = fastify();
+
+const folderTmp = "./tmp";
+
+if (!fs.existsSync(folderTmp)) {
+  fs.mkdirSync(folderTmp);
+}
 
 app.get("/hello", async () => {
   const test = await knex("sqlite_schema").select("*");
