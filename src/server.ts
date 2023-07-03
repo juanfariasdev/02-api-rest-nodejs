@@ -11,8 +11,8 @@ if (!fs.existsSync(folderTmp)) {
 }
 
 app.get("/hello", async () => {
-  const test = await knex("sqlite_schema").select("*");
-  return test;
+  const transactions = await knex("transactions").select("*");
+  return transactions;
 });
 
 app
