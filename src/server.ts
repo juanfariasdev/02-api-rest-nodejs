@@ -4,7 +4,7 @@ import fs from "node:fs";
 
 const app = fastify();
 
-const folderTmp = "./tmp";
+const folderTmp = "./db";
 
 if (!fs.existsSync(folderTmp)) {
   fs.mkdirSync(folderTmp);
