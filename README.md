@@ -1,6 +1,7 @@
 # RF
 
 - [x] O usuário deve poder deletar uma transação;
+- [x] O usuário deve poder obter um resumo da sua conta;
 
 # RN
 

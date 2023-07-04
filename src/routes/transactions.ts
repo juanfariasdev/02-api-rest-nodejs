@@ -31,4 +31,26 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
     response.status(201).send("Deleted transaction");
   });
+
+  app.get("/summary", async () => {
+    const credit = await knex("transactions")
+      .sum("amount", { as: "credit" })
+      .where("amount", ">", 0)
+      .first()
+      .then((value) => Number(value?.credit));
+
+    const debit = await knex("transactions")
+      .sum("amount", { as: "debit" })
+      .where("amount", "<", 0)
+      .first()
+      .then((value) => Number(value?.debit));
+
+    const summary = {
+      amount: credit + debit,
+      credit,
+      debit: debit * -1,
+    };
+
+    return { summary };
+  });
 }
