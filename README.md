@@ -2,6 +2,7 @@
 
 - [x] O usuário deve poder deletar uma transação;
 - [x] O usuário deve poder obter um resumo da sua conta;
+- [x] O usuário deve poder listar todas as transações que já ocorreram;
 
 # RN
 
