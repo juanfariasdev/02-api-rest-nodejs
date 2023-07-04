@@ -23,4 +23,12 @@ export async function transactionsRoutes(app: FastifyInstance) {
 
     response.status(201).send("Created transaction");
   });
+  app.delete("/:id", async (request, response) => {
+    const getTransactionParamsSchema = z.object({ id: z.string().uuid() });
+    const { id } = getTransactionParamsSchema.parse(request.params);
+
+    await knex("transactions").delete().where("id", id);
+
+    response.status(201).send("Deleted transaction");
+  });
 }
