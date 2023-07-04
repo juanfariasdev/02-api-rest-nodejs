@@ -1,74 +1,129 @@
 import { randomUUID } from "node:crypto";
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
+
 import { knex } from "../database";
+import { checkSessionIdExists } from "../middlewares/check-session-id-exists";
 
 export async function transactionsRoutes(app: FastifyInstance) {
-  app.post("/", async (request, response) => {
-    const createTransactionBodySchema = z.object({
-      title: z.string().min(3, "The title needs at least 3 characters"),
-      amount: z.number(),
-      type: z.enum(["credit", "debit"]),
-    });
+  app.get(
+    "/",
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      let { sessionId } = request.cookies;
 
-    const { title, amount, type } = createTransactionBodySchema.parse(
-      request.body
-    );
+      const transactions = await knex("transactions")
+        .select()
+        .where("session_id", sessionId);
 
-    await knex("transactions").insert({
-      id: randomUUID(),
-      title,
-      amount: type === "credit" ? amount : amount * -1,
-    });
+      return { transactions };
+    }
+  );
 
-    response.status(201).send("Created transaction");
-  });
+  app.get(
+    "/:id",
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      const getTransactionParamsSchema = z.object({ id: z.string().uuid() });
+      const { id } = getTransactionParamsSchema.parse(request.params);
 
-  app.get("/", async () => {
-    const transactions = await knex("transactions").select("*");
+      const { sessionId } = request.cookies;
 
-    return { transactions };
-  });
+      const transaction = await knex("transactions")
+        .select("*")
+        .where({ id, session_id: sessionId })
+        .first();
 
-  app.get("/:id", async (request) => {
-    const getTransactionParamsSchema = z.object({ id: z.string().uuid() });
-    const { id } = getTransactionParamsSchema.parse(request.params);
+      return { transaction };
+    }
+  );
 
-    const transaction = await knex("transactions")
-      .select("*")
-      .where("id", id)
-      .first();
+  app.get(
+    "/summary",
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request) => {
+      const { sessionId } = request.cookies;
 
-    return { transaction };
-  });
-  app.delete("/:id", async (request, response) => {
-    const getTransactionParamsSchema = z.object({ id: z.string().uuid() });
-    const { id } = getTransactionParamsSchema.parse(request.params);
+      const credit = await knex("transactions")
+        .sum("amount", { as: "credit" })
+        .where("amount", ">", 0)
+        .andWhere("session_id", sessionId)
+        .first()
+        .then((value) => Number(value?.credit));
 
-    await knex("transactions").delete().where("id", id);
+      const debit = await knex("transactions")
+        .sum("amount", { as: "debit" })
+        .where("amount", "<", 0)
+        .andWhere("session_id", sessionId)
+        .first()
+        .then((value) => Number(value?.debit));
 
-    response.status(201).send("Deleted transaction");
-  });
+      const summary = {
+        amount: credit + debit,
+        credit,
+        debit: debit * -1,
+      };
 
-  app.get("/summary", async () => {
-    const credit = await knex("transactions")
-      .sum("amount", { as: "credit" })
-      .where("amount", ">", 0)
-      .first()
-      .then((value) => Number(value?.credit));
+      return { summary };
+    }
+  );
 
-    const debit = await knex("transactions")
-      .sum("amount", { as: "debit" })
-      .where("amount", "<", 0)
-      .first()
-      .then((value) => Number(value?.debit));
+  app.delete(
+    "/:id",
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request, response) => {
+      const getTransactionParamsSchema = z.object({ id: z.string().uuid() });
+      const { id } = getTransactionParamsSchema.parse(request.params);
 
-    const summary = {
-      amount: credit + debit,
-      credit,
-      debit: debit * -1,
-    };
+      const { sessionId } = request.cookies;
 
-    return { summary };
-  });
+      const item = await knex("transactions")
+        .select()
+        .where({ id, session_id: sessionId })
+        .first();
+
+      if (!item?.id) response.status(400).send("item not found");
+
+      await knex("transactions").delete().where({ id, session_id: sessionId });
+
+      response.status(201).send("Deleted transaction");
+    }
+  );
+
+  app.post(
+    "/",
+    {
+      preHandler: [checkSessionIdExists],
+    },
+    async (request, response) => {
+      const createTransactionBodySchema = z.object({
+        title: z.string().min(3, "The title needs at least 3 characters"),
+        amount: z.number(),
+        type: z.enum(["credit", "debit"]),
+      });
+
+      let { sessionId } = request.cookies;
+
+      const { title, amount, type } = createTransactionBodySchema.parse(
+        request.body
+      );
+
+      await knex("transactions").insert({
+        id: randomUUID(),
+        title,
+        amount: type === "credit" ? amount : amount * -1,
+        session_id: sessionId,
+      });
+
+      response.status(201).send("Created transaction");
+    }
+  );
 }
