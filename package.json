@@ -4,6 +4,7 @@
   "description": "Api Rest using nodeJS and fastify",
   "main": "server.ts",
   "scripts": {
+    "build": "tsup src --out-dir build",
     "dev": "tsx watch src/server.ts",
     "knex": "node --no-warnings --loader tsx ./node_modules/knex/bin/cli.js",
     "lint": "eslint src --ext .ts --fix",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@types/node": "^20.3.2",
     "@types/supertest": "^2.0.12",
+    "tsup": "^7.1.0",
     "tsx": "^3.12.7",
     "vitest": "^0.32.4"
   }
