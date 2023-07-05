@@ -2,7 +2,7 @@
 
 **Trilha:** NodeJS 2023
 
-Feito pela [Rocketseat](https://www.rocketseat.com.br)
+API desenvolvida durante as aulas da [Rocketseat](https://www.rocketseat.com.br)
 
 ## Tecnologias Utilizadas
 
