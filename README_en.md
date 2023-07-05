@@ -2,7 +2,7 @@
 
 [Clique aqui para ler o README em português (Brasil)](README.md)
 
-# Project: 02-api-rest-nodejs
+# Project: API-Rest-NodeJS
 
 **Track:** NodeJS 2023
 
