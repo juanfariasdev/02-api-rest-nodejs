@@ -44,6 +44,16 @@ O projeto "02-api-rest-nodejs" tem como objetivo desenvolver uma API REST utiliz
 - [x] Identificação do usuário deve ser mantida entre as requisições.
 - [x] O usuário só pode visualizar as transações que ele criou.
 
+## Instalação e Execução
+
+Siga as instruções abaixo para instalar e executar o projeto:
+
+1. Execute o comando `npm install` para instalar as dependências.
+2. Execute o comando `npm run build` para realizar a compilação do projeto.
+3. Execute o comando `npm run knex -- migrate:latest` para executar as migrações do banco de dados.
+
+Para iniciar o projeto em modo de desenvolvimento, após instalar as dependências execute o comando `npm run dev`.
+
 ## Rotas
 
 - `GET /session`:
