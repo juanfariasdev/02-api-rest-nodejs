@@ -5,7 +5,7 @@ export const config: Knex.Config = {
   client: env.DATABASE_CLIENT,
   connection:
     env.DATABASE_CLIENT === "pg"
-      ? env.DATABASE_URL
+      ? env.DATABASE_URL + "?sslmode=require"
       : {
           filename: env.DATABASE_URL,
         },
