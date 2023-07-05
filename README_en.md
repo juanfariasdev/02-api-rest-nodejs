@@ -32,7 +32,7 @@ API developed during the classes at [Rocketseat](https://www.rocketseat.com.br)
 
 ## Summary
 
-The "02-api-rest-nodejs" project aims to develop a REST API using Fastify, Typescript, and other mentioned tools.
+The "API-Rest-NodeJS" project aims to develop a REST API using Fastify, Typescript, and other mentioned tools.
 
 ## Functional Requirements
 
